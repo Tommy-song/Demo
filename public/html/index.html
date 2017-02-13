@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		* {margin: 0; padding: 0;}
+		div {box-sizing: border-box;}
+		body {background: black; /*padding: 20px;*/}
+		#box {width: 600px; height: 600px; background: white; margin: 40px auto;}
+	</style>
+	<script src="../javascripts/jquery-1.9.1.min.js"></script>
+	<script>
+		$(function() {
+			var panel = {
+				ctx : $("#panel")[0].getContext("2d"),
+				roadR : 200,
+				draw : function() {
+					balls.update();
+					bullets.update();
+
+					var ctx = this.ctx;
+					setInterval(function() {
+						ctx.clearRect(0, 0, $("#panel").width(), $("#panel").height());
+						ctx.restore();
+
+						ctx.beginPath();
+						ctx.arc(300, 200, 200, -90 * Math.PI / 180, Math.PI, false);
+						ctx.stroke();
+
+						ctx.beginPath();
+						ctx.arc(250, 200, 150, Math.PI, Math.PI * 2);
+						ctx.stroke();
+
+						ctx.beginPath();
+						ctx.arc(400, 200, 20, 0, 2 * Math.PI);
+						ctx.stroke();
+
+						balls.draw();
+						frog.draw();
+						bullets.draw();
+
+						ctx.save();
+						ctx.font = "60px impact";
+						ctx.fillStyle = "red";
+
+						ctx.shadowOffsetX = 10;
+						ctx.shadowOffsetY = 10;
+						ctx.shadowColor = "green";
+						ctx.shadowBlur = 5;
+
+						var http = "https://127.0.0.1:8081/index.html";
+						var index = http.lastIndexOf("/");
+						var length = http.length;
+						var name = http.substring(http.lastIndexOf("/") + 1, http.lastIndexOf("."));
+						name = http.substr(-0, 2);
+						var char = http.charAt(6);
+						var array = http.split("/");
+
+						var a = "hello";
+						var b = ", world!";
+						var c = a.concat(b);
+						console.info(c);
+
+						var x = ($("#panel").width() - ctx.measureText("简易祖玛").width) / 2;
+						var y = 450;
+						ctx.fillText("简易祖玛", x, y);
+						ctx.restore();
+
+					}, 1000 / 60);
+				},
+				onmusemove : function() {
+					$("#panel").on("mousemove", function(ev) {
+						var ev = ev || window.ev;
+
+						var x = ev.clientX - $("#panel").offset().left - 300;
+						var y = ev.clientY - $("#panel").offset().top - 200;
+						var l = Math.sqrt(x * x + y * y);
+
+						if (x > 0 && y < 0) {
+							frog.degRotate = Math.asin(x / l);
+						} else if (x > 0 && y > 0) {
+							frog.degRotate = Math.asin(y / l) + 1 / 2 * Math.PI;
+						} else if (x < 0 && y > 0) {
+							frog.degRotate = Math.asin(-x / l) + Math.PI;
+						} else if (x < 0 && y < 0) {
+							frog.degRotate = Math.asin(-y / l) + 3 / 2 * Math.PI;
+						}
+					});
+				},
+				onmousedown : function() {
+					$("#panel").on("mousedown", function(ev) {
+						var ev = ev || window.ev;
+						var x = ev.clientX - $("#panel").offset().left - 300;
+						var y = ev.clientY - $("#panel").offset().top - 200;
+						var l = Math.sqrt(x * x + y * y);
+						var speed = 5;
+
+						var dx = speed * (x / l);
+						var dy = speed * (y / l);
+						
+						bullets.objs.push({x : 300, y : 200, r : 20, sx : dx, sy : dy});
+					});
+				}
+			};
+
+			var balls = {
+				objs : [{x : 300, y : 0, r : 20, rotateR : 200, deg : 0, startX : 300, startY : 0}],
+				update : function() {
+					setInterval(function() {
+						balls.objs.push({
+							x : 300,
+							y : 0,
+							r : 20,
+							rotateR : 200,
+							deg : 0,
+							startX : 300,
+							startY : 0
+						});
+					}, 350);
+
+					setInterval(function() {
+						$.each(balls.objs, function(index, obj) {
+							obj.deg ++;
+
+							if (obj.deg == 270) {
+								obj.rotateR = 150;
+								obj.startX = 250;
+								obj.startY = 50;
+							}
+
+							if (obj.deg == 360 + 90) {
+								alert("额，游戏结束!")
+								window.location.reload();
+							}
+
+							obj.x = obj.startX + (Math.sin(obj.deg * Math.PI / 180) * obj.rotateR);
+							obj.y = obj.startY + (obj.rotateR - Math.cos(obj.deg * Math.PI / 180) * obj.rotateR);
+		
+						});
+					}, 30);
+
+				},
+				draw : function(fun) {
+					var ctx = panel.ctx;
+					$.each(balls.objs, function(index, obj) {
+						ctx.save();
+						ctx.beginPath();
+						ctx.moveTo(obj.x, obj.y);
+						ctx.arc(obj.x, obj.y, obj.r, 0, Math.PI * 2);
+						ctx.fill();
+						ctx.restore();
+					});
+
+					if (fun && typeof(fun) == "function") fun();
+				}
+			};			
+
+			var frog = {
+				img : null,
+				degRotate : 0,
+				onload : function() {
+					this.img = new Image();
+					this.img.src = "../images/frog.png";
+
+					panel.onmusemove();
+					panel.onmousedown();
+
+					this.img.onload = function() {
+						panel.draw();
+					};
+				},
+				draw : function() {
+					var ctx = panel.ctx;
+
+					ctx.save();
+					ctx.translate(300, 200);
+					ctx.rotate(this.degRotate);
+					ctx.translate(-40, -40);
+					ctx.drawImage(frog.img, 0, 0);
+					ctx.restore();
+				}
+			};
+
+			var bullets = {
+				objs : [],
+				update : function() {
+					setInterval(function() {
+						$.each(bullets.objs, function(index, obj) {
+							obj.x += obj.sx;
+							obj.y += obj.sy;
+						});
+
+						bullets.ontouch();
+					}, 30);
+				},
+				draw : function() {
+					var ctx = panel.ctx;
+					$.each(bullets.objs, function(index, obj) {
+						ctx.save();
+						ctx.fillStyle = "red";
+						ctx.moveTo(obj.x, obj.y);
+						ctx.arc(obj.x, obj.y, 20, 0, 2 * Math.PI);
+						ctx.fill();
+						ctx.restore();
+					});
+				},
+				ontouch : function() {
+					var end = false;
+					$.each(bullets.objs, function(index, obj) {
+						if (end) return false;
+
+						var bullet = obj;
+						var bulletIndex = index;
+						$.each(balls.objs, function(index, obj) {
+							var ball = obj;
+							var ballIndex = index;
+							var sumR = Math.sqrt((bullet.x - ball.x) * (bullet.x - ball.x) + (bullet.y - ball.y) * (bullet.y - ball.y));
+
+							if (sumR <= bullet.r + ball.r) {
+								bullets.objs.splice(bulletIndex, 1);
+								balls.objs.splice(ballIndex, 1);
+
+								end = true;
+								return false;
+							}
+						});
+					});
+				}
+			};
+
+			frog.onload();
+
+		});
+	</script>
+</head>
+<body>
+	<div id="box">
+		<canvas id="panel" width="600" height="600">
+			
+		</canvas>
+	</div>
+</body>
+</html>

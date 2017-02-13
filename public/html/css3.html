@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>css3Test</title>
+	<style>
+		* {margin: 0; padding: 0;}
+		body {padding: 50px 0 0 50px;}
+		#monkey {width: 150px; height: 150px;background: radial-gradient(ellipse, rgba(255, 0, 0, 0), rgba(255, 0, 0, 1)); padding: 10px 20px;  box-shadow: 10px 10px 5px #888; /*background: url(../images/frog.png) center no-repeat; background-size: 100% 100%; background-origin: content-box;*/ font-size: 2em; text-shadow: 5px 5px 2px gray; overflow: hidden; text-overflow: ellipsis; word-wrap: break-word; word-break:break-all ; border-radius: 15px 50px;  position: relative;transition: transform 2s; columns: 2; column-gap: 20px; column-rule: solid 1px lightblue; resize: both; }
+		header {column-span: all;}
+
+		img {margin-top: 20px; /*filter: drop-shadow(8px 8px 10px green);*/ box-shadow: 8px 8px 10px gray; width: 300px; height: 300px; transition: 0.4s; display: block;}
+		img:hover {border: solid 1px gray; /*animation: scale 1s;*/ filter: opacity(0.7);}
+
+		.scale {animation: scale 1s;}
+
+		/*#monkey:hover {transform: translate(200px, 200px);}*/
+
+		@media only screen and (max-width: 800px) {
+			/*img {width: 50%;}*/
+		}
+
+		@media only screen and (max-width: 600px) {
+			img {width : 100%;}
+		}
+
+		@keyframes scale {
+			from {transform: scale(0);}
+			to {transform: scale(1);}
+		}
+		@keyframes move {
+			0% {left : 0; top : 0;}
+			50% {left : 200px; top : 200px;}
+			100% {left : 0; top : 0;}
+		}
+
+		#box {width: 300px; height: 300px; display: table-cell; vertical-align: middle; border: solid 1px green;}
+		#little-box {width: 200px; /*height: 200px;*/ margin: 0 auto; border: solid 1px red; zoom: 1;}
+		#little-box:after {content: "020"; display: block; clear: both; height: 0; visibility: hidden;}
+		span#name {width: 50px; height: 50px; margin: 10px 20px; padding: 10px 20px; display: block;}
+		div#a {width: 50px; height: 50px; border: solid 1px; display: inline-block; margin: 20px;}
+		
+		div.float {width: 50px; height: 50px; border: solid 1px; float: left;}
+	</style>
+	<script src="../javascripts/jquery-1.9.1.min.js"></script>
+	<script>
+		$(function() {
+			function Mokey(div) {
+				this.deg = 0;
+				this.move = function() {
+					this.deg += 180;
+					div.css({"transform" : "translate(200px, 200px)"});
+				}
+			}
+
+			var monkey1 = new Mokey($("#monkey"));
+			// $("#monkey").on("mouseover", function() {
+			// 	// monkey1.move();
+			// });
+
+			setTimeout(function() {
+				// monkey1.move();
+			}, 1000);
+
+			$("img").on("mousedown", function() {
+				$(this).addClass("scale");
+				setTimeout(function() {
+					$("img").removeClass("scale");
+				}, 1000);
+			});
+		});
+	</script>
+</head>
+<body>
+	<div id ="monkey">
+	<header>name</header>
+	songsongsongsongsongsongsongsongsongsongsongsongsongsongsongsongsongsongsongsongongsongsongsongsongsongsongsongso
+	</div>
+
+	<img src="../images/pineapple.jpg" alt="paris">
+
+	<br>
+	<div id="box">
+		<div id="little-box">
+			<!-- <span id="name">song</span>
+			<div id="a">911</div>ttt -->
+
+			<div class="float">111</div>
+			<div class="float">222</div>
+		</div>
+	</div>
+</body>
+</html>

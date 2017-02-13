@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>表单</title>
+	<style>
+		body {margin: 0; padding: 100px 0 0 200px; background: linear-gradient(#e2f0f9, #fff) no-repeat; height: 100%; transition: 1s;} /*#f8f8ff*/
+		form {width: 600px; border: solid 1px #e3e3e3; border-radius: 5px; padding: 20px; background: white; position: relative; transition: 1s;}
+		.header {font-size: 35px; margin: 0 0 15px 0; font-family: "Arial","Microsoft YaHei","黑体","宋体",sans-serif;}
+		#content {background: #efefef; padding: 20px;}
+		#content input[type="text"] {width: 50%; height: 2em; border-radius: 3px; padding: 0 0.5em; margin-bottom: 1em; font-size: 1.1em;}
+		#submit {width: 25%; height: 1.7em; font-size: 20px; background: #fbae46; border-radius: 8px; color: #efefef; margin-top: 10px;}
+
+		#message {width: 80%; max-height: 130px; word-wrap: break-word; overflow: auto; background: #c3c3c3; /*margin-top: 50px;*/position: relative; box-sizing: border-box;}
+		@keyframes scaleShow {
+			0% {transform: scale(0);}
+			50% {transform: scale(0.9)}
+			80% {transform: scale(0.7)}
+			100% {transform: scale(1);}
+		}
+		@media only screen and (max-width: 900px) {
+			body {padding-left:0; background: linear-gradient(#e2f0f9, #fff) no-repeat;}
+			.header {padding-left: 50px;}
+			form {width: 100%; padding: 0}
+			#message {width: 100%;}
+		}
+	</style>
+	<script src="../javascripts/jquery-1.9.1.min.js"></script>
+	<script>
+		$(function() {
+			$("#info-box").submit(function() {
+
+				$.ajax({
+					url : "http://127.0.0.1:8081/action",
+					type : "POST",
+					data : $("#info-box").serialize(),
+					dataType : "json",
+					success : function(data) {
+						var message = "";
+						$.each(data, function(name,value) {
+							message += name + ":" + value + "<br/>";
+						});
+
+						$("#message").prepend(message).css({ "-webkit-animation" : "scaleShow 1s",  "padding": "10px 20px"});
+						$("form").css({"-webkit-transform" : "translateY(-30px)"});
+					},
+					error: function(data) {
+						alert("请求失败!");
+					}
+				});
+
+				return false;
+			});
+
+			$("body").on("mousedown", function() {
+				$(this).css({"transform" : "rotate(360deg)"});
+			});
+
+			$("#info-box").children().andSelf().on("mousedown", function(e) {e.stopPropagation();});
+		})
+	</script>
+</head>
+<body>
+	<form action="" id="info-box">
+		<h1 class="header">Personal information:</h1>
+		<div id="content">
+			<input type="text" name="firstName"," id=""  placeholder="First name"> <br>
+			<input type="text" name="lastname"," id=""  placeholder="Last name"> <br>
+			<input type="text" name="sex"," id=""  placeholder="sex"> <br>
+			<input type="text" name="telephone"," id=""  placeholder="telephone"> <br>
+			<input type="text" name="email"," id=""  placeholder="email"> <br>
+			<input type="submit" value="It's ok." id="submit">
+		</div>
+	</form>
+
+	<div id="message">
+		
+	</div>
+</body>
+</html>
